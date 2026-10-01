@@ -17,16 +17,19 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib.lines import Line2D
+import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import config
+
 # ── Paths ────────────────────────────────────────────────────────────────────
-ROOT    = Path('.')
-OUT_DIR = ROOT / 'analysis/cjc reports/heat_risk_index'
+OUT_DIR = config.REPORTS / 'heat_risk_index'
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-INDEX   = ROOT / 'data/cdcr/CDCR_heat_risk_index_additive_25_25_50.csv'
-CA_GEO  = ROOT / 'data/ca_outline_simple.json'
-SENS    = ROOT / 'data/cdcr/CDCR_heat_risk_sensitivity.csv'
+INDEX   = config.INDEX_CSV
+CA_GEO  = config.CA_OUTLINE
+SENS    = config.SENSITIVITY_CSV
 
 df_all  = pd.read_csv(INDEX)
 ca      = gpd.read_file(CA_GEO)
@@ -273,9 +276,9 @@ md_lines = [
     f'# CDCR Facility Heat Risk Index — Report',
     f'',
     f'**Date:** April 2026',
-    f'**Notebook:** `analysis/CDCR_risk_indices/heat_risk_index.ipynb`',
-    f'**Sensitivity:** `analysis/CDCR_risk_indices/sensitivity_analysis.ipynb`',
-    f'**Output data:** `data/cdcr/CDCR_heat_risk_index_additive_25_25_50.csv`, `data/cdcr/CDCR_heat_risk_sensitivity.csv`',
+    f'**Notebook:** `index/heat_risk_index.ipynb`',
+    f'**Sensitivity:** `index/sensitivity_analysis.ipynb`',
+    f'**Output data:** `data/CDCR_heat_risk_index_additive_25_25_50.csv`, `data/CDCR_heat_risk_sensitivity.csv`',
     f'',
     f'---',
     f'',

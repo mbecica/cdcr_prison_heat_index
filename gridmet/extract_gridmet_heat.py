@@ -2,9 +2,9 @@
 gridMET daily maximum temperature extraction for CDCR state prisons.
 
 Outputs:
-  data_sources/hazards/heat/heat_activations_daily.csv   — daily tmax + activation flags per facility (2016–2025)
-  data_sources/hazards/heat/heat_activations_annual.csv  — annual counts per facility
-  data_sources/hazards/heat/heat_activations_monthly.csv — monthly counts per facility per year
+  gridmet/data/heat_activations_daily.csv   — daily tmax + activation flags per facility (2016–2025)
+  gridmet/data/heat_activations_annual.csv  — annual counts per facility
+  gridmet/data/heat_activations_monthly.csv — monthly counts per facility per year
 
 Metrics (all columns carry a `gridmet_` source prefix; the modeled LOCA2-CA
 equivalents carry `loca2_` and a period suffix, so the two never collide):
@@ -51,9 +51,11 @@ STAGE1_F = 90.0
 STAGE3_F = 95.0
 DELTA_F = 10.0  # degrees above facility mean summer tmax
 
-REPO_ROOT = Path(__file__).resolve().parents[4]
-FACILITIES_CSV = REPO_ROOT / "data" / "cdcr" / "cdcr_facilities.csv"
-OUTPUT_DIR = REPO_ROOT / "data_sources" / "hazards" / "heat"
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import config  # noqa: E402
+
+REPO_ROOT = config.ROOT
+OUTPUT_DIR = config.GRIDMET_DATA
 
 
 # ---------------------------------------------------------------------------
@@ -65,12 +67,9 @@ def kelvin_to_f(k):
 
 
 def load_facilities():
-    """Return the 31 CDCR state prisons (non-camp, cdcr_code present)."""
-    df = pd.read_csv(FACILITIES_CSV)
-    prisons = df[
-        df["cdcr_code"].notna() &
-        (df["cdcr_firecamp"] != True)
-    ][["cdcr_code", "name", "latitude", "longitude"]].copy()
+    """Return the CDCR institutions with their FEMA centroid coordinates."""
+    df = config.load_institutions()
+    prisons = df[["cdcr_code", "name", "latitude", "longitude"]].copy()
     prisons = prisons.reset_index(drop=True)
     print(f"  {len(prisons)} CDCR state prisons loaded")
     return prisons

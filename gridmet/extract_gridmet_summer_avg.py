@@ -6,7 +6,7 @@ For 1990–2015: downloads gridMET year files, extracts summer tmax, deletes fil
 For 2016–2025: reads from existing heat_activations_daily.csv.
 
 Output:
-  data_sources/hazards/summer_avg_tmax_annual.csv
+  gridmet/data/summer_avg_tmax_annual.csv
   Columns: cdcr_code, year, avg_summer_tmax_f
 
 Usage:
@@ -19,6 +19,7 @@ import os
 import tempfile
 import csv
 from collections import defaultdict
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -32,10 +33,12 @@ import xarray as xr
 
 GRIDMET_URL   = "https://www.northwestknowledge.net/metdata/data/tmmx_{year}.nc"
 DOWNLOAD_YEARS = range(1990, 2016)   # 1990–2015; 2016–2025 read from existing CSV
-REPO_ROOT      = Path(__file__).resolve().parents[4]
-FACILITIES_CSV = REPO_ROOT / "data" / "cdcr" / "cdcr_facilities.csv"
-DAILY_CSV      = REPO_ROOT / "data_sources" / "hazards" / "heat" / "heat_activations_daily.csv"
-OUTPUT_CSV     = REPO_ROOT / "data_sources" / "hazards" / "heat" / "summer_avg_tmax_annual.csv"
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import config  # noqa: E402
+
+REPO_ROOT      = config.ROOT
+DAILY_CSV      = config.GRIDMET_DATA / "heat_activations_daily.csv"
+OUTPUT_CSV     = config.GRIDMET_DATA / "summer_avg_tmax_annual.csv"
 
 
 # ---------------------------------------------------------------------------
@@ -47,11 +50,8 @@ def kelvin_to_f(k):
 
 
 def load_facilities():
-    df = pd.read_csv(FACILITIES_CSV)
-    prisons = df[
-        df["cdcr_code"].notna() &
-        (df["cdcr_firecamp"] != True)
-    ][["cdcr_code", "name", "latitude", "longitude"]].copy()
+    df = config.load_institutions()
+    prisons = df[["cdcr_code", "name", "latitude", "longitude"]].copy()
     prisons = prisons.reset_index(drop=True)
     print(f"  {len(prisons)} CDCR state prisons loaded")
     return prisons

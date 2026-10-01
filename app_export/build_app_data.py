@@ -17,6 +17,7 @@ Outputs (into the sibling `website` repo):
 """
 import json
 import shutil
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -24,13 +25,14 @@ import pandas as pd
 from shapely import wkt
 from shapely.geometry import mapping
 
-REPO = Path(__file__).resolve().parents[2]          # ca_prison_climate_justice/
-SITE = REPO.parent / "website"                        # sibling website repo (private)
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import config  # noqa: E402
+
+SITE = config.WEBSITE_REPO                            # sibling website repo (private)
 OUT = Path(__file__).resolve().parent / "output"      # canonical open-source data, next to this script
-RISK_CSV = REPO / "data/cdcr/CDCR_heat_risk_index_additive_25_25_50.csv"
-FAC_CSV = REPO / "data/cdcr/cdcr_facilities.csv"
-HAZ_CSV = REPO / "data/allfacilities_climate_hazards.csv"   # outdoor climate metrics
-OUTLINE = REPO / "data/ca_outline_simple.json"
+RISK_CSV = config.INDEX_CSV
+HAZ_CSV = config.ALL_HAZARDS                          # outdoor climate metrics
+OUTLINE = config.CA_OUTLINE
 
 CATEGORIES = ["Lowest", "Moderate", "High", "Highest"]
 
@@ -191,7 +193,7 @@ def classify(v, breaks):
 
 def main():
     risk = pd.read_csv(RISK_CSV)
-    fac = pd.read_csv(FAC_CSV).dropna(subset=["cdcr_code"])
+    fac = config.load_institutions()
     haz = pd.read_csv(HAZ_CSV).set_index("facilityid")   # outdoor climate, by facilityid
 
     # Self-identifying index version (from the index CSV; defaults to v0.2).

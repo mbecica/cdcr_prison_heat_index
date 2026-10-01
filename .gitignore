@@ -1,0 +1,13 @@
+# Generated report drafts and figures (index/generate_heat_risk_report.py)
+reports/
+
+# Local working notes
+notes/
+
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
