@@ -2,10 +2,10 @@
 """
 Generate CDCR Heat Risk Index report:
   - PNG maps (risk, hazard, exposure, vulnerability — current + mid-century)
-  - Markdown report: analysis/cjc reports/heat_risk_index/heat_risk_index_report.md
+  - Markdown report: reports/heat_risk_index/heat_risk_index_report.md
 
-Run from project root:
-  conda run -n data_science python3 analysis/CDCR_risk_indices/generate_heat_risk_report.py
+Usage:
+  python3 index/generate_heat_risk_report.py
 """
 
 import os
@@ -255,8 +255,8 @@ if SENS.exists():
     sens_df = pd.read_csv(SENS)
 
 # Reproduce the mid-century Jenks breaks for the tier-table display. Use jenkspy (as the index
-# notebook does) — NOT mapclassify, which yields slightly different breaks. Categories are now
-# computed per period (v0.3); this table reports the mid-century breaks.
+# notebook does) — NOT mapclassify, which yields slightly different breaks. Categories are
+# computed per period; this table reports the mid-century breaks.
 mc_scores = mc['risk_score'].tolist()
 import jenkspy
 breaks_arr = jenkspy.jenks_breaks(mc_scores, n_classes=4)[1:]  # drop running min; inner edges + max
@@ -386,7 +386,7 @@ md_lines += [
     f'| Moderate | {break_low_mod} – {break_mod_high} | {n_mod} | {mod_list} |',
     f'| Lowest | ≤ {break_low_mod} | {n_lowest} | {lowest_list} |',
     f'',
-    f'> Jenks natural breaks (k=4) computed on mid-century risk scores. As of v0.3, categories are computed separately for each period (each period classified against its own range), so the current-period map spans all four tiers; the cross-period max-normalized score still carries the absolute current → mid-century increase.',
+    f'> Jenks natural breaks (k=4) computed on mid-century risk scores. Categories are computed separately for each period (each period classified against its own range), so the current-period map spans all four tiers; the cross-period max-normalized score still carries the absolute current → mid-century increase.',
     f'',
     f'---',
     f'',

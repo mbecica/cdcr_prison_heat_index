@@ -7,7 +7,7 @@ CA outline, and regenerates the 31 per-prison Hugo content stubs.
 
 Re-run this whenever the underlying CSVs change:
 
-    python3 analysis/app_export/build_app_data.py
+    python3 app_export/build_app_data.py
 
 Outputs (into the sibling `website` repo):
     website/data/prison_heat_index.json          (Hugo .Site.Data — no-JS list + stub gen)
@@ -196,8 +196,8 @@ def main():
     fac = config.load_institutions()
     haz = pd.read_csv(HAZ_CSV).set_index("facilityid")   # outdoor climate, by facilityid
 
-    # Self-identifying index version (from the index CSV; defaults to v0.2).
-    index_version = str(risk["index_version"].iloc[0]) if "index_version" in risk.columns else "v0.2"
+    # Self-identifying index version, from the index CSV.
+    index_version = str(risk["index_version"].iloc[0])
 
     cur = risk[risk.time_period == "current"].set_index("cdcr_code")
     mid = risk[risk.time_period == "midcentury"].set_index("cdcr_code")
@@ -254,10 +254,9 @@ def main():
             "periods": {"historic": period(c), "midcentury": period(m)},
             "profile": {
                 "hazard": {
-                    # Modeled outdoor climate (heat index v0.3). days_over_90 is an
-                    # absolute-threshold display metric; the hazard SCORE is built on
-                    # the relative thresholds below (hot days above the facility's own
-                    # summer mean +10°F, warm nights above its 1961-1990 Apr-Oct P95).
+                    # Modeled outdoor climate. In the hazard score, hot days are an equal
+                    # blend of days over 90°F and days above the facility's own summer
+                    # mean +10°F; warm nights are above its 1961-1990 Apr-Oct P95.
                     "days_over_90": {
                         "historic": num(hz("heat_days_over_90_historic")),
                         "midcentury": num(hz("heat_days_over_90_midcentury")),
@@ -278,9 +277,7 @@ def main():
                 },
                 "cooling": {
                     # Housing-unit cooling mix from the CDCR Air Cooling Pilot
-                    # Supplemental Report (Jan 2026, as of Dec 2025) — the newest,
-                    # complete, per-facility source. Replaces the older, incomplete
-                    # Reuters FOIA equipment inventory (pct_units_*). Mixed-cooling
+                    # Supplemental Report (Jan 2026, as of Dec 2025). Mixed-cooling
                     # units are counted under each type, so shares can sum slightly >1.
                     # Only "mechanical" is refrigerated AC; evaporative and ventilation
                     # do not provide reliable cooling.
