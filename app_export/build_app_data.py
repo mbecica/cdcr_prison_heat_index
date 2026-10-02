@@ -228,12 +228,9 @@ def main():
                                          breaks=vuln_breaks),
         }
 
-    # NOTE (open item, flagged by author July 2026): the CSV calls the baseline
-    # period "current", but it is a 1991–2020 modeled HISTORIC baseline, so the
-    # app labels it "Historic". The intended full set is Historic / Mid-Century /
-    # End-Century; End-Century data does not exist in the source CSV yet, so only
-    # two periods ship for now. Exposure & vulnerability are held constant across
-    # periods (2025 values) by design — only the heat hazard changes.
+    # The "current" period's hazard is the LOCA2-CA historic model climate,
+    # 1981–2010. Exposure and vulnerability are held constant across periods
+    # (2025 values); only the heat hazard changes.
     prisons = []
     for code in codes:
         c, m, f = cur.loc[code], mid.loc[code], facx.loc[code]
@@ -359,7 +356,7 @@ def main():
             "n_prisons": len(prisons),
             "weights": {"hazard": 0.25, "exposure": 0.25, "vulnerability": 0.50},
             "periods": {
-                "historic": {"label": "Current", "sub": "1991–2020"},
+                "historic": {"label": "Current", "sub": "1981–2010"},
                 "midcentury": {"label": "Mid-century", "sub": "2041–2070"},
             },
             "planned_periods": ["endcentury"],  # data not yet available; see script note
